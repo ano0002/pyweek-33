@@ -1,4 +1,3 @@
-from turtle import position
 from ursina import *
 
 class CustomButton(Entity):
