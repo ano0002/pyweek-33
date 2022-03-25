@@ -32,7 +32,8 @@ class CustomButton(Entity):
 class Bubble(Text):
     
     def __init__(self,text,position,next=None, **kwargs):
-        super().__init__(text=text[:1],collider="box",size=.015,font="assets\\fonts\\Fipps-Regular.otf")
+        super().__init__(text=text[:1],collider="box",size=.05,current_color=color.white,font="assets\\fonts\\8-bit Arcade In.ttf")
+        self.out = Text(text=text[:1],size=.05,current_color=color.black,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self)
         if isinstance(position,Entity):
             self.position = position.position + Vec3(position.scale_x/2,position.scale_y/2,0)
         else :
@@ -41,7 +42,6 @@ class Bubble(Text):
             setattr(self, key, value)
         self.full_text=text
         self.next = next
-
 
     def on_click(self):
         self.skip()
@@ -57,8 +57,7 @@ class Bubble(Text):
             self.next = None
             self.visible = False
             self.disable()
-            
-    
+                
     def appear(self,text=None, speed=.025):
         self.enabled = True
         if self.appear_sequence:
@@ -69,12 +68,14 @@ class Bubble(Text):
         self.appear_sequence = Sequence()
         tn = self.text_nodes[0]
         tn.node().setText('')
+        self.out.text_nodes[0].node().setText('')
         new_text = ''
 
         for char in target_text:
             new_text += char
             self.appear_sequence.append(Wait(speed))
             self.appear_sequence.append(Func(tn.node().setText, new_text))
+            self.appear_sequence.append(Func(self.out.text_nodes[0].node().setText, new_text))
 
         self.appear_sequence.start()
         return self.appear_sequence
@@ -93,7 +94,7 @@ if __name__ == "__main__":
         return " ".join(random_word(random.randint(2,6)) for i in range(length))
     
     app = Ursina()
-    window.color = color.rgb(11,11,11)
+    window.color = color.white #color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
         bubble = Bubble("random_sentence(5)",position=(0,(random.random()-0.5)*0.5),next=new_text)
