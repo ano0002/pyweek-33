@@ -32,7 +32,7 @@ class CustomButton(Entity):
 class Bubble(Text):
     
     def __init__(self,text,position,next=None, **kwargs):
-        super().__init__(text=text[:1],collider="box",current_color =color.black)
+        super().__init__(text=text[:1],collider="box",size=.015,font="assets\\fonts\\Fipps-Regular.otf")
         if isinstance(position,Entity):
             self.position = position.position + Vec3(position.scale_x/2,position.scale_y/2,0)
         else :
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     window.color = color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
-        bubble = Bubble(random_sentence(5),position=(0,(random.random()-0.5)*0.5),next=new_text)
+        bubble = Bubble("random_sentence(5)",position=(0,(random.random()-0.5)*0.5),next=new_text)
         bubble.appear()
     
     new_text()
