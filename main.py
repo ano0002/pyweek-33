@@ -2,6 +2,7 @@ from ursina import *
 from player import Player
 from level import Map
 from start_menu import StartMenu
+from ui import Bubble
 
 app = Ursina(vsync = True)
 
@@ -48,7 +49,18 @@ def update():
         elem.next_frame(elapsed_time=elapsed_time,iteration = iteration)
     elapsed_time+=time.dt
     iteration+=1
-    
+
+def input(key):
+    if key == "space" or key == "left mouse down":
+        for entity in scene.entities :
+            if isinstance(entity,Bubble):
+                entity.skip()
+    if key == "a" :
+        bubble = Bubble("random text placeholder",position=player1)
+        bubble.appear()
+        
+
+
 _ed = EditorCamera( )
 
 app.run()

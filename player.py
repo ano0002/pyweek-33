@@ -103,7 +103,9 @@ class Player(Entity):
         if self.frames % 3 == 0 :
             death = boxcast(origin = self.position+Vec3(0,self.scale_y/2,0),ignore=(self,), direction = (0,-1,0),distance=self.scale_y)
             if death.hit :
-                self.die()
+                for entity in death.entities:
+                    if not isinstance(entity,Text):
+                        self.die()
         
     def input(self,key):
         if key == self.controls[1]:

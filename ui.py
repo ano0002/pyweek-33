@@ -31,20 +31,22 @@ class CustomButton(Entity):
         
 class Bubble(Text):
     
-    def __init__(self,text,position,next=None, **kwargs):
-        super().__init__(text=text[:1],collider="box",size=.05,current_color=color.white,font="assets\\fonts\\8-bit Arcade In.ttf")
-        self.out = Text(text=text[:1],size=.05,current_color=color.black,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self)
+    def __init__(self,text,position,next=None,size=.5, **kwargs):
+        super().__init__(text=text[:1],collider="box",size=size,current_color=color.white,font="assets\\fonts\\8-bit Arcade In.ttf",parent=scene)
+        self.out = Text(text=text[:1],size=size,current_color=color.black,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self)
         if isinstance(position,Entity):
-            self.position = position.position + Vec3(position.scale_x/2,position.scale_y/2,0)
+            self.position = position.position + Vec3(position.scale_x,position.scale_y,0)
         else :
             self.position = position
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.full_text=text
         self.next = next
+        self.collider.width = self.get_width()
 
     def on_click(self):
-        self.skip()
+        self.collider.scale_x = self.get_width()
+        #self.skip()
     
     def skip(self):
         if self.appear_sequence and not self.appear_sequence.finished:
@@ -81,7 +83,6 @@ class Bubble(Text):
         return self.appear_sequence
 
 
-
 if __name__ == "__main__":
     import random,string
     
@@ -97,7 +98,7 @@ if __name__ == "__main__":
     window.color = color.white #color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
-        bubble = Bubble("random_sentence(5)",position=(0,(random.random()-0.5)*0.5),next=new_text)
+        bubble = Bubble("random sentence 5 ",position=(0,(random.random()-0.5)*0.5),next=new_text)
         bubble.appear()
     
     new_text()
