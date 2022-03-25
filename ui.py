@@ -44,6 +44,9 @@ class Bubble(Text):
 
 
     def on_click(self):
+        self.skip()
+    
+    def skip(self):
         if self.appear_sequence and not self.appear_sequence.finished:
             self.appear_sequence.finish()
         else :
@@ -54,6 +57,7 @@ class Bubble(Text):
             self.next = None
             self.visible = False
             self.disable()
+            
     
     def appear(self,text=None, speed=.025):
         self.enabled = True
@@ -86,13 +90,13 @@ if __name__ == "__main__":
     
     #Create a function that generate random sentences using random word
     def random_sentence(length):
-        return " ".join(random_word(random.randint(2,10)) for i in range(length))
+        return " ".join(random_word(random.randint(2,6)) for i in range(length))
     
     app = Ursina()
     window.color = color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
-        bubble = Bubble(random_sentence(5),position=(0,random.random()-0.5),next=new_text)
+        bubble = Bubble(random_sentence(5),position=(0,(random.random()-0.5)*0.5),next=new_text)
         bubble.appear()
     
     new_text()
