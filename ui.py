@@ -40,16 +40,22 @@ class Bubble(Text):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.full_text=text
-        self.create_background()
-        self.appear()
+        self.next = next
 
 
     def on_click(self):
-        if self.appear_sequence:
+        if self.appear_sequence and not self.appear_sequence.finished:
             self.appear_sequence.finish()
-        
+        else :
+            if isinstance(self.next,Bubble):
+                self.next.appear()
+            elif self.next != None:
+                self.next()
+            self.next = None
+            self.visible = False
+            self.disable()
+    
     def appear(self,text=None, speed=.025):
-        from ursina.ursinastuff import invoke
         self.enabled = True
         if self.appear_sequence:
             self.appear_sequence.finish()
@@ -65,7 +71,6 @@ class Bubble(Text):
             new_text += char
             self.appear_sequence.append(Wait(speed))
             self.appear_sequence.append(Func(tn.node().setText, new_text))
-            self.appear_sequence.append(Func(setattr,self.background,"scale_x",self.scale_x))
 
         self.appear_sequence.start()
         return self.appear_sequence
@@ -73,12 +78,25 @@ class Bubble(Text):
 
 
 if __name__ == "__main__":
+    import random,string
+    
+    #Create a function that generate random word
+    def random_word(length):
+        return ''.join(random.choice(string.ascii_letters) for i in range(length))
+    
+    #Create a function that generate random sentences using random word
+    def random_sentence(length):
+        return " ".join(random_word(random.randint(2,10)) for i in range(length))
+    
     app = Ursina()
     window.color = color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
-        Bubble("play_button sometimes again",position=(0,.2))
-    play = CustomButton("play_button",scale = 0.2,on_click=new_text)
+        print("test")
+        bubble = Bubble(random_sentence(5),position=(0,random.random()-0.5),next=new_text)
+        bubble.appear()
+    
+    new_text()
     
     _ed = EditorCamera()
     app.run()

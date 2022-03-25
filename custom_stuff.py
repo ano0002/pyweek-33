@@ -1,5 +1,4 @@
 from ursina import *
-import time
 
 class CustomAnimator():
     def __init__(self, animations, start_state):
