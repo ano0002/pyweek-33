@@ -92,7 +92,6 @@ if __name__ == "__main__":
     window.color = color.rgb(11,11,11)
     scene.fog_density = 0
     def new_text():
-        print("test")
         bubble = Bubble(random_sentence(5),position=(0,random.random()-0.5),next=new_text)
         bubble.appear()
     
