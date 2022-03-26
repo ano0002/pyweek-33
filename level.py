@@ -1,4 +1,3 @@
-from numpy import isin
 from ursina import *
      
 class Air():
@@ -7,14 +6,12 @@ class Air():
     animated = False
     def __init__(self,**kwargs):
         pass
-
 class Plain(Entity):
     solid = True
     drag = 0
     animated = False
     def __init__(self,position,**kwargs):
         super().__init__(model="plane",rotation_x=-90,position = position,color=color.black,**kwargs)
-
 class Water(Entity):
     solid = False
     drag = 0.8
@@ -90,7 +87,6 @@ class Button(Entity):
                     if not self.map.disappearings_block[indices].solid :
                         self.map.disappearings_block[indices].appear()
                 self.texture="button_ontop.png"
-            
 class Lever(Entity):
     solid = False
     drag = 0
@@ -145,17 +141,25 @@ class DisappearingWall(Entity):
     
     def on_click(self):
         self.toggle()
-        
 class Door(Entity):
     solid = False
     drag = 0
     animated = False
-    def __init__(self,position,**kwargs):
+    def __init__(self,position,mapdata,**kwargs):
         super().__init__(model="cube",position = position,texture="door",collider="box",**kwargs)
+        self.map = mapdata
     
     def activate(self,player):
-        player.freeze()
-        self.activate = None
+        if not player.evil :
+            self.map.end()
+        else :
+            alive = 0
+            for player in self.map.players :
+                alive += player.enabled 
+            if alive == 1:
+                self.map.end()
+            else :
+                player.freeze()
 
 
 class Spike(Entity):
@@ -166,7 +170,6 @@ class Spike(Entity):
     def __init__(self,position,**kwargs):
         super().__init__(model="cube",position = position,texture="spike",**kwargs)
         self.collider = BoxCollider(self,center=(0,-0.2,0),size=(1,0.6,1))
-        
 class HorizontalSawBlade(Animation):
     solid = False
     drag = 0
@@ -184,7 +187,6 @@ class HorizontalSawBlade(Animation):
             self.velocity *= -1
         elif self.map.data[map_y][self.X+1] not in (17,18) and self.velocity == 1:
             self.velocity *= -1
-            
 class VerticalSawBlade(Animation):
     solid = False
     drag = 0
@@ -233,11 +235,13 @@ BLOCK_IDS = {
 }
 
 class Map():
-    def __init__(self,file) -> None:
+    def __init__(self,file,end) -> None:
         self.data = []
         self.to_animate = []
         self.load(file)
         self.disappearings_block = []
+        self.end= end
+        self.players = []
     
     def load(self,file):
         with open(file,"r") as f:
@@ -301,6 +305,9 @@ class Map():
                     spawns[abs(block)-2] = (j,-i)
         return spawns
     
+    def add_player(self,player):
+        self.players.append(player)
+
     def is_solid(self,pos):
         if self.data[pos[0]][pos[1]]<0:
             return False

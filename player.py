@@ -12,7 +12,7 @@ class Turn(Animation):
         super().__init__("turn",texture_scale = (direction,1),scale=.2,color=color.black,origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
 
 class Player(Entity):
-    def __init__(self,level,speed = 6,gravity = 1,max_jumps =1,sprite_scale=1,controls = ["q","z","d"],evil=False,**kwargs):
+    def __init__(self,level,speed = 6,gravity = 1,max_jumps =1,sprite_scale=(1,1),controls = ["q","z","d"],evil=False,**kwargs):
         super().__init__(model="cube",collider="box",scale = (0.9,0.62),always_on_top=True, **kwargs)
         self.visible_self = False
         self.y -= self.scale_y/4
@@ -28,6 +28,8 @@ class Player(Entity):
         self.jump_height = 13
         
         self.controls = controls
+        
+        self.evil = evil
         
         world_sprite_scale = (sprite_scale[0]/self.scale_x,sprite_scale[1]/self.scale_y)
         sprite_y = self.y-self.scale_y/2
@@ -116,7 +118,7 @@ class Player(Entity):
             touching = self.intersects()
             if touching.hit :
                 for entity in touching.entities:
-                    if (hasattr(entity,"deadly") and entity.deadly == True) or isinstance(entity,Player):
+                    if (hasattr(entity,"deadly") and entity.deadly == True) or (isinstance(entity,Player) and not entity.freezed):
                         self.die()
                     if hasattr(entity,"activate") and entity.activate != None:
                         entity.activate(self)

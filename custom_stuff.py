@@ -32,7 +32,6 @@ class Dialogue():
             for line in f.readlines():
                 self.lines.append(line.strip().split(":"))
         self.after = after
-        self.next()
     
     def next(self):
         from ui import Bubble   

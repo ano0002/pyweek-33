@@ -17,13 +17,10 @@ class CustomButton(Entity):
             if self.highlight_scale != 1:
                 self.scale = self.original_scale*self.highlight_scale
 
-
-
     def on_mouse_exit(self):
         if not self.disabled and self.model:
             if not mouse.left and self.highlight_scale != 1:
                 self.scale = self.original_scale
-
 
     def on_click(self):
         if self.disabled:

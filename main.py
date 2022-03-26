@@ -17,19 +17,40 @@ sfx = {
 window.color = color.black
 scene.fog_density = 0
 
-level = Map("levels/1.2.csv")
-
-
-def start():
-    global player1,player2
-    sfx["door"].play()
+def next_level():
+    global level,dialogue_file
+    freeze()
+    for entity in scene.entities :
+        if not isinstance(entity,Player) :
+            destroy(entity)
+    
+    level,dialogue_file = gamemap.pop(0)
+    level.add_player(player1)
+    level.add_player(player2)
     level.generate()
     level.setup_camera()
-    spawn_pos = level.get_spawns()
-    player1 = Player(level,position = spawn_pos[0],sprite_scale = (1,1))
-    player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1),evil=True)
-    #Dialogue("lore/start.dialogue",player1,player2,unfreeze)
-    unfreeze()
+    restart()
+    dialogue = Dialogue(dialogue_file,player1,player2,unfreeze)
+    dialogue.next()
+    
+gamemap = [(Map("levels/1.1.csv",end=next_level),"lore/start.dialogue"),(Map("levels/1.2.csv",end=next_level),"lore/2.dialogue")]
+
+level,dialogue_file = (None,None)
+
+    
+def start():
+    global level,dialogue_file,player1,player2
+    sfx["door"].play()
+    level,dialogue_file = gamemap.pop(0)
+    level.generate()
+    level.setup_camera()
+    player1 = Player(level)
+    player2 = Player(level,evil=True)
+    level.add_player(player1)
+    level.add_player(player2)
+    restart()
+    dialogue = Dialogue(dialogue_file,player1,player2,unfreeze)
+    dialogue.next()
     
 def restart():
     spawn_pos = level.get_spawns()
@@ -63,8 +84,9 @@ iteration = 0
 
 def update():
     global elapsed_time,iteration
-    for elem in level.to_animate :
-        elem.next_frame(elapsed_time=elapsed_time,iteration = iteration)
+    if level != None :
+        for elem in level.to_animate :
+            elem.next_frame(elapsed_time=elapsed_time,iteration = iteration)
     elapsed_time+=time.dt
     iteration+=1
 
