@@ -24,6 +24,8 @@ class Player(Entity):
         
         self.jumps = 0
         self.max_jumps = max_jumps
+        self.points=0
+        self.jump_height = 12
         
         self.controls = controls
         
@@ -119,7 +121,7 @@ class Player(Entity):
             if self.jumps < self.max_jumps :
                 jump = Jump(self.position-Vec3(0,self.scale_y/2,0))
                 destroy(jump,delay = .35)
-                self.velocity[1] = 12
+                self.velocity[1] = self.jump_height
                 self.jumps += 1
                 
         elif key == self.controls[0]:

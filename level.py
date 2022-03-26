@@ -1,4 +1,19 @@
+from numpy import isin
 from ursina import *
+     
+class Air():
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,**kwargs):
+        pass
+
+class Plain(Entity):
+    solid = True
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="plane",rotation_x=-90,position = position,color=color.black,**kwargs)
 
 class Water(Entity):
     solid = False
@@ -48,6 +63,43 @@ class Vines3(Entity):
     def __init__(self,position,**kwargs):
         super().__init__(model="cube",position = position,texture="vines_3.png",**kwargs)
 
+
+class Button(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="button_ontop.png",**kwargs)
+        self.collider = BoxCollider(self,center=(0,-0.2,0),size=(1,0.6,1))
+        self.is_touched = False
+
+    def update(self):
+        self.is_touched= self.intersects().hit
+        if self.is_touched :
+            self.texture = "pushed_button_ontop.png"
+        else :
+            self.texture="button_ontop.png"
+            
+class Lever(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="lever.png",**kwargs)
+        self.collider = BoxCollider(self,center=(0,-0.2,0),size=(1,0.6,1))
+        self.was_touched = False
+        self.activated = False
+
+    def update(self):
+        if self.intersects().hit :
+            if not self.was_touched :
+                self.activated = not self.activated
+            self.was_touched = True
+        else :
+            self.was_touched = False
+            
+        self.texture_scale = (1-2*self.activated,1)
+
 class DisappearingWall(Entity):
     drag = 0
     animated = False
@@ -55,7 +107,7 @@ class DisappearingWall(Entity):
     def __init__(self,position,mapdata,**kwargs):
         self.solid = True
         self.mapdata = mapdata.data
-        super().__init__(model="cube",position = position,color=color.gray,**kwargs)
+        super().__init__(model="cube",position = position,color=color.rgb(0,255,0),**kwargs)
 
     def disappear(self):
         self.mapdata[abs(self.Y)][abs(self.X)] = -1
@@ -63,7 +115,7 @@ class DisappearingWall(Entity):
         
     def appear(self):
         self.mapdata[abs(self.Y)][abs(self.X)] = 0
-        self.animate_color(color.gray)
+        self.animate_color(color.rgb(0,255,0))
     
     def toggle(self):
         if self.color == color.clear :
@@ -74,7 +126,6 @@ class DisappearingWall(Entity):
     def on_click(self):
         self.toggle()
         
-
 class Door(Entity):
     solid = False
     drag = 0
@@ -83,22 +134,9 @@ class Door(Entity):
         super().__init__(model="cube",position = position,texture="door",collider="box",**kwargs)
     
     def activate(self,player):
-        print("stuff")
+        player.freeze()
         self.activate = None
-     
-class Air():
-    solid = False
-    drag = 0
-    animated = False
-    def __init__(self,**kwargs):
-        pass
 
-class Plain(Entity):
-    solid = True
-    drag = 0
-    animated = False
-    def __init__(self,position,**kwargs):
-        super().__init__(model="plane",rotation_x=-90,position = position,color=color.black,**kwargs)
 
 class Spike(Entity):
     solid = False
@@ -170,6 +208,8 @@ BLOCK_IDS = {
     16:DisappearingWall,
     17:Air,#SawBlade Paths
     18:HorizontalSawBlade,
+    20:Lever,
+    25:Button,
 }
 
 class Map():
@@ -177,10 +217,11 @@ class Map():
         self.data = []
         self.to_animate = []
         self.load(file)
+        self.disappearings_block = []
     
     def load(self,file):
         with open(file,"r") as f:
-            for line in f.readlines():
+            for line in f.readlines()[:-1]:
                 self.data.append(list(map(lambda x : int(x),line.strip().split(","))))
 
         self.scale = self.width,self.height = len(self.data[1]),len(self.data)
@@ -191,9 +232,18 @@ class Map():
             i = -i
             for j,block in enumerate(line):
                 if block > -1 :
-                    block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
-                    if block.animated :
-                        self.to_animate.append(block)
+                    if block < 20 :
+                        block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
+                        if block.animated :
+                            self.to_animate.append(block)
+                        if isinstance(block,DisappearingWall):
+                            self.disappearings_block.append(block)
+                    elif block<25:
+                        block = BLOCK_IDS[20](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
+                        
+                    elif block<30:
+                        block = BLOCK_IDS[25](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
+                        
         for j,(up,down) in enumerate(zip(self.data[0],self.data[-1])):
             if down > -1 :
                 block = BLOCK_IDS[down](position=(j,-self.height),above=down)
