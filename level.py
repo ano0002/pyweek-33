@@ -1,4 +1,3 @@
-from turtle import position
 from ursina import *
 
 class Water(Entity):
@@ -10,12 +9,22 @@ class Water(Entity):
         
     def next_frame(self,elapsed_time,**kwargs):
         self.texture_offset = (0,elapsed_time/5)
+  
+class Door(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="door",**kwargs)
+        
      
 class Air():
     solid = False
     drag = 0
     animated = False
-        
+    def __init__(self,**kwargs):
+        pass
+    
 class Dirt(Entity):
     solid = True
     drag = 0
@@ -41,7 +50,7 @@ class Ground():
     solid = True
     drag = 0
     animated = False
-    def __init__(self,position,above):
+    def __init__(self,position,above,**kwargs):
         
         if above == 1 or position[1]==0:
             self = Dirt(position = position)
@@ -52,9 +61,51 @@ class Spike(Entity):
     solid = False
     drag = 0
     animated = False
+    deadly=True
     def __init__(self,position,**kwargs):
         super().__init__(model="cube",collider="box",position = position,texture="spike",**kwargs)
         
+class HorizontalSawBlade(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    deadly=True
+    def __init__(self,position,mapdata,**kwargs):
+        super().__init__(model="sphere",color=color.black,collider="sphere",position = position,**kwargs)
+        self.velocity = 1
+        self.map = mapdata
+    
+    def update(self):
+        map_y = int(abs(self.position[1]))
+        self.x += time.dt*self.velocity
+        if self.map.data[map_y][self.X] not in (5,6) and self.velocity == -1:
+            self.velocity *= -1
+        elif self.map.data[map_y][self.X+1] not in (5,6) and self.velocity == 1:
+            self.velocity *= -1
+            
+class VerticalSawBlade(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    deadly=True
+    def __init__(self,position,mapdata,**kwargs):
+        super().__init__(model="sphere",color=color.black,collider="sphere",position = position,**kwargs)
+        self.velocity = 1
+        self.map = mapdata
+        self.last_y_change = self.y
+    
+    def update(self):
+        map_y = int(abs(self.position[1]))+1
+        self.y += time.dt*self.velocity
+        
+        if abs(self.last_y_change-self.y)>0.5 :
+            if self.map.data[map_y][self.X] not in (7,6) and self.velocity == -1:
+                self.velocity *= -1
+                self.last_y_change = self.y
+            elif self.map.data[map_y-1][self.X] not in (7,6) and self.velocity == 1:
+                self.velocity *= -1
+                self.last_y_change = self.y
+    
  
 BLOCK_IDS = {
     0 : Air,
@@ -62,12 +113,17 @@ BLOCK_IDS = {
     2 : Water,
     3 : Plain,
     4 : Spike,
+    5 : HorizontalSawBlade,
+    6 : Air,
+    7 : VerticalSawBlade,
+    8 : Door,
 }
 
 class Map():
     def __init__(self,file) -> None:
         self.data = []
         self.to_animate = []
+        self.entities = []
         self.load(file)
     
     def load(self,file):
@@ -80,13 +136,15 @@ class Map():
     def generate(self):
 
         for i,line in enumerate(self.data):
+            line = []
             i = -i
             for j,block in enumerate(line):
                 if block > 0 :
-                    block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j])
+                    block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
                     if block.animated :
                         self.to_animate.append(block)
-
+                    line.append(block)
+            self.entities.append(line)
         for j,(up,down) in enumerate(zip(self.data[0],self.data[-1])):
             if down > 0 :
                 block = BLOCK_IDS[down](position=(j,-self.height),above=down)
@@ -97,7 +155,7 @@ class Map():
                 if block.animated :
                     self.to_animate.append(block)
 
-        self.background = Entity(model="cube",scale=self.scale,position=((self.width-1)/2,-(self.height-1)/2,1),color=color.gray,texture="back.jpg")
+        self.background = Entity(model="cube",scale=self.scale,position=((self.width-1)/2,-(self.height-1)/2,1),color=color.white)#,texture="back.jpg")
 
     def get_spawns(self):
         spawns = []

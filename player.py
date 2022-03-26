@@ -5,15 +5,15 @@ from custom_stuff import CustomAnimator,average,Particle
 
 class Jump(Animation):
     def __init__(self,pos, **kwargs):
-        super().__init__("jump",scale=(2,2/3),origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
+        super().__init__("jump",scale=(2,2/3),origin = (0,-.5),color=color.black,position = pos,loop=False,autoplay=True,**kwargs)
 
 class Turn(Animation):
     def __init__(self,pos,direction=1, **kwargs):
-        super().__init__("turn",texture_scale = (direction,1),scale=.2,origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
+        super().__init__("turn",texture_scale = (direction,1),scale=.2,color=color.black,origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
 
 class Player(Entity):
     def __init__(self,level,speed = 6,gravity = 1,max_jumps =2,sprite_scale=1,controls = ["q","z","d"],**kwargs):
-        super().__init__(model="cube",collider="box",scale = (0.6,0.9), **kwargs)
+        super().__init__(model="cube",collider="box",scale = (0.9,0.3), **kwargs)
         self.visible_self = False
         
         self.map = level
@@ -28,9 +28,10 @@ class Player(Entity):
         self.controls = controls
         
         world_sprite_scale = (sprite_scale[0]/self.scale_x,sprite_scale[1]/self.scale_y)
-        idle = Entity(model='plane',texture="idle",scale=world_sprite_scale,parent = self,color = self.color,rotation_x=-90)
-        right = Animation("walk",parent = self,scale=world_sprite_scale,color = self.color)
-        left = Animation("walk",parent = self,scale=world_sprite_scale,color = self.color,texture_scale = (-1,1))
+        sprite_y = self.y-self.scale_y/2
+        idle = Animation("idle",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
+        right = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
+        left = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,texture_scale = (-1,1),world_y=sprite_y)
         self.sprite = CustomAnimator(
             animations = {
                 'idle' : idle,
@@ -104,7 +105,7 @@ class Player(Entity):
             death = boxcast(origin = self.position+Vec3(0,self.scale_y/2,0),ignore=(self,), direction = (0,-1,0),distance=self.scale_y)
             if death.hit :
                 for entity in death.entities:
-                    if not isinstance(entity,Text):
+                    if hasattr(entity,"deadly") and entity.deadly == True:
                         self.die()
         
     def input(self,key):
@@ -117,12 +118,12 @@ class Player(Entity):
                 
         elif key == self.controls[0]:
             if self.grounded :
-                turn = Turn(self.position-Vec3(0,self.scale_y/2,0),direction=-1)
+                turn = Turn(self.position-Vec3(-self.scale_x/2,self.scale_y/2,0),direction=-1)
                 destroy(turn,delay = .35)
                 
         elif key == self.controls[2]:
             if self.grounded :
-                turn = Turn(self.position-Vec3(0,self.scale_y/2,0))
+                turn = Turn(self.position-Vec3(self.scale_x/2,self.scale_y/2,0))
                 destroy(turn,delay = .35)
     
     def die(self):

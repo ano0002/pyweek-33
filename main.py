@@ -25,9 +25,8 @@ def start():
     level.generate()
     level.setup_camera()
     spawn_pos = level.get_spawns()
-
-    player1 = Player(level,position = spawn_pos[0],sprite_scale = (1,1.1))
-    player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1.1),controls=['left arrow','up arrow','right arrow'])
+    player1 = Player(level,position = spawn_pos[0],sprite_scale = (1,1))
+    player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1),controls=['left arrow','up arrow','right arrow'])
 
 
 StartMenu(on_start=start)
