@@ -1,5 +1,4 @@
 from ursina import *
-from ui import Bubble
 
 class CustomAnimator():
     def __init__(self, animations, start_state):
@@ -33,10 +32,10 @@ class Dialogue():
             for line in f.readlines():
                 self.lines.append(line.strip().split(":"))
         self.after = after
-        print(self.lines)
         self.next()
     
     def next(self):
+        from ui import Bubble   
         if len(self.lines) > 0 :
             user,text = self.lines.pop(0)
             if user == "mom":
@@ -47,7 +46,8 @@ class Dialogue():
             self.current.appear()
             
         else :
-            self.after()
+            if self.after != None :
+                self.after()
 
 def average(liste):
     return sum(liste)/len(liste)

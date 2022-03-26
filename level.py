@@ -5,7 +5,7 @@ class Water(Entity):
     drag = 0.8
     animated = True
     def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,texture="water.png",color = color.white50,**kwargs)
+        super().__init__(model="cube",position = position,texture="water.png",color = color.white,**kwargs)
         
     def next_frame(self,elapsed_time,**kwargs):
         self.texture_offset = (0,elapsed_time/5)
@@ -27,46 +27,22 @@ class Air():
     animated = False
     def __init__(self,**kwargs):
         pass
-    
-class Dirt(Entity):
-    solid = True
-    drag = 0
-    animated = False
-    def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,texture="dirt.png",**kwargs)
-
-class Grass(Entity):
-    solid = True
-    drag = 0
-    animated = False
-    def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,texture="grass.png",**kwargs)
 
 class Plain(Entity):
     solid = True
     drag = 0
     animated = False
     def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,color=color.rgb(28,28,28),**kwargs)
+        super().__init__(model="cube",position = position,color=color.black,**kwargs)
 
-class Ground():
-    solid = True
-    drag = 0
-    animated = False
-    def __init__(self,position,above,**kwargs):
-        
-        if above == 1 or position[1]==0:
-            self = Dirt(position = position)
-        else :
-            self =  Grass(position = position)
- 
 class Spike(Entity):
     solid = False
     drag = 0
     animated = False
     deadly=True
     def __init__(self,position,**kwargs):
-        super().__init__(model="cube",collider="box",position = position,texture="spike",**kwargs)
+        super().__init__(model="cube",position = position,texture="spike",**kwargs)
+        self.collider = BoxCollider(self,center=(0,-0.2,0),size=(1,0.6,1))
         
 class HorizontalSawBlade(Animation):
     solid = False
@@ -111,17 +87,25 @@ class VerticalSawBlade(Animation):
     
  
 BLOCK_IDS = {
-    0 : Air,
-    1 : Ground,
+    -1 : Air,
+    0:Air,
+    1:Air,
+    2:Air,
+    3:Spike,
+    4:Air,
+    5:Air,
+    6:Air,
+    7 : Plain,
+    8 : Door,
+}
+"""
     2 : Water,
     3 : Plain,
     4 : Spike,
     5 : HorizontalSawBlade,
     6 : Air,
     7 : VerticalSawBlade,
-    8 : Door,
-}
-
+"""
 class Map():
     def __init__(self,file) -> None:
         self.data = []
@@ -160,13 +144,14 @@ class Map():
         spawns = []
         for i in self.data:
             for j in i :
-                spawns.append(None)
-        
+                if j <-1 :
+                    spawns.append(None)
+                    
         for i,val in enumerate(self.data):
             for j,block in enumerate(val) :
-                if block <0 :
-                    spawns[abs(block)-1] = (j,-i+1)
-                    self.data[i][j] = 0
+                if block <-1 :
+                    spawns[abs(block)-2] = (j,-i)
+                    self.data[i][j] = -1
         return spawns
     
     def is_solid(self,pos):

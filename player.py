@@ -13,9 +13,9 @@ class Turn(Animation):
 
 class Player(Entity):
     def __init__(self,level,speed = 6,gravity = 1,max_jumps =2,sprite_scale=1,controls = ["q","z","d"],**kwargs):
-        super().__init__(model="cube",collider="box",scale = (0.9,0.62), **kwargs)
+        super().__init__(model="cube",collider="box",scale = (0.9,0.62),always_on_top=True, **kwargs)
         self.visible_self = False
-        
+        self.y -= self.scale_y/4
         self.map = level
         
         self.velocity = Vec2(0,0)
@@ -42,8 +42,11 @@ class Player(Entity):
         )
         self.sprite.set_state("idle")
         self.frames = 0
+        self.freezed = True
         
     def update(self):
+        if self.freezed :
+            self.velocity = [0,0]
         self.frames +=1
         x = self.x +0.5 +self.velocity[0]*time.dt
         right = int(x+self.scale_x/2)
@@ -141,3 +144,9 @@ class Player(Entity):
                              duration = 0.2,
                              velocity=(x, y),
                              color = color.black)
+
+    def freeze(self) :
+        self.freezed = True
+        
+    def unfreeze(self) :
+        self.freezed = False

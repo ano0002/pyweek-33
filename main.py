@@ -2,6 +2,7 @@ from ursina import *
 from player import Player
 from level import Map
 from start_menu import StartMenu
+from custom_stuff import Dialogue
 from ui import Bubble
 
 app = Ursina(vsync = True)
@@ -13,10 +14,10 @@ sfx = {
     "door" : Audio("Door",autoplay=False)
 }
 
-window.color = color.rgb(11,11,11)
+window.color = color.black
 scene.fog_density = 0
 
-level = Map("levels/map.csv")
+level = Map("levels/test.csv")
 
 
 def start():
@@ -27,7 +28,14 @@ def start():
     spawn_pos = level.get_spawns()
     player1 = Player(level,position = spawn_pos[0],sprite_scale = (1,1))
     player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1),controls=['left arrow','up arrow','right arrow'])
+    Dialogue("lore/start.dialogue",player1,player2,unfreeze)
 
+def unfreeze():
+    player1.unfreeze()
+    player2.unfreeze()
+def freeze():
+    player1.freeze()
+    player2.freeze()
 
 StartMenu(on_start=start)
 
