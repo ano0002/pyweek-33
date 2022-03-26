@@ -101,12 +101,13 @@ class Player(Entity):
             self.sprite.set_state("right")
             
         self.grounded = abs(self.velocity[1])<self.gravity/2
-        if self.frames % 3 == 0 :
-            death = boxcast(origin = self.position+Vec3(0,self.scale_y/2,0),ignore=(self,), direction = (0,-1,0),distance=self.scale_y)
-            if death.hit :
-                for entity in death.entities:
-                    if hasattr(entity,"deadly") and entity.deadly == True:
-                        self.die()
+        touching = self.intersects()
+        if touching.hit :
+            for entity in touching.entities:
+                if hasattr(entity,"deadly") and entity.deadly == True:
+                    self.die()
+                if hasattr(entity,"activate") and entity.activate != None:
+                    entity.activate(self)
         
     def input(self,key):
         if key == self.controls[1]:
@@ -139,7 +140,7 @@ class Player(Entity):
                              curve = curve.linear_boomerang,
                              duration = 0.2,
                              velocity=(x, y),
-                             color = color.white)
+                             color = color.black)
         self.disable()
 
         print("Ouch")

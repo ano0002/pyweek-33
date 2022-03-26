@@ -15,8 +15,11 @@ class Door(Entity):
     drag = 0
     animated = False
     def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,texture="door",**kwargs)
-        
+        super().__init__(model="cube",position = position,texture="door",collider="box",**kwargs)
+    
+    def activate(self,player):
+        print("stuff")
+        self.activate = None
      
 class Air():
     solid = False
@@ -65,13 +68,13 @@ class Spike(Entity):
     def __init__(self,position,**kwargs):
         super().__init__(model="cube",collider="box",position = position,texture="spike",**kwargs)
         
-class HorizontalSawBlade(Entity):
+class HorizontalSawBlade(Animation):
     solid = False
     drag = 0
     animated = False
     deadly=True
     def __init__(self,position,mapdata,**kwargs):
-        super().__init__(model="sphere",color=color.black,collider="sphere",position = position,**kwargs)
+        super().__init__("saw",fps=4,collider="box",position = position,scale=1,**kwargs)
         self.velocity = 1
         self.map = mapdata
     
@@ -83,13 +86,13 @@ class HorizontalSawBlade(Entity):
         elif self.map.data[map_y][self.X+1] not in (5,6) and self.velocity == 1:
             self.velocity *= -1
             
-class VerticalSawBlade(Entity):
+class VerticalSawBlade(Animation):
     solid = False
     drag = 0
     animated = False
     deadly=True
     def __init__(self,position,mapdata,**kwargs):
-        super().__init__(model="sphere",color=color.black,collider="sphere",position = position,**kwargs)
+        super().__init__("saw",fps=4,collider="box",position = position,scale=1,**kwargs)
         self.velocity = 1
         self.map = mapdata
         self.last_y_change = self.y
@@ -123,7 +126,6 @@ class Map():
     def __init__(self,file) -> None:
         self.data = []
         self.to_animate = []
-        self.entities = []
         self.load(file)
     
     def load(self,file):
@@ -136,15 +138,12 @@ class Map():
     def generate(self):
 
         for i,line in enumerate(self.data):
-            line = []
             i = -i
             for j,block in enumerate(line):
                 if block > 0 :
                     block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
                     if block.animated :
                         self.to_animate.append(block)
-                    line.append(block)
-            self.entities.append(line)
         for j,(up,down) in enumerate(zip(self.data[0],self.data[-1])):
             if down > 0 :
                 block = BLOCK_IDS[down](position=(j,-self.height),above=down)
