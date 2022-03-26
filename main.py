@@ -51,7 +51,8 @@ def update():
 
 def input(key):
     if key == "space" or key == "left mouse down":
-        for entity in scene.entities :
+        entities = scene.entities.copy()
+        for entity in  entities:
             if isinstance(entity,Bubble):
                 entity.skip()
     if key == "a" :

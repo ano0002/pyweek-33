@@ -1,4 +1,5 @@
 from ursina import *
+from ui import Bubble
 
 class CustomAnimator():
     def __init__(self, animations, start_state):
@@ -19,6 +20,49 @@ class Particle(Entity):
                            curve=curve)
         self.animate_position(self.position+Vec3(velocity[0],velocity[1],0)*duration, duration=duration)
 
+class Dialogue():
+    def __init__(self,file,main,evil,after) -> None:
+        self.users = {
+            "main" : main,
+            "evil" : evil,
+            "mom" : (0,-2,0),
+            "action" : (0,-2,0)
+            }
+        self.lines = []
+        with open(file,"r") as f:
+            for line in f.readlines():
+                self.lines.append(line.strip().split(":"))
+        self.after = after
+        print(self.lines)
+        self.next()
+    
+    def next(self):
+        if len(self.lines) > 0 :
+            user,text = self.lines.pop(0)
+            if user == "mom":
+                text = "mom : "+text
+            elif user =="action" :
+                text = "*"+text+"*"
+            self.current = Bubble(text,self.users[user],next=self.next)
+            self.current.appear()
+            
+        else :
+            self.after()
 
 def average(liste):
     return sum(liste)/len(liste)
+
+if __name__ =="__main__":
+    app = Ursina()
+    
+    def input(key):
+        if key == "space" or key == "left mouse down":
+            entities = scene.entities.copy()
+            for entity in  entities:
+                if isinstance(entity,Bubble):
+                    entity.skip()
+                    
+    Dialogue("lore/start.dialogue",(5,0,0),(-5,0,0),Func(print,"test"))
+    
+    _ed = EditorCamera()
+    app.run()

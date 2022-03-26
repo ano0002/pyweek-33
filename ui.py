@@ -32,8 +32,7 @@ class CustomButton(Entity):
 class Bubble(Text):
     def __init__(self,text,position,next=None,size=.5, **kwargs):
         self.default_resolution = 1080
-        super().__init__(text=text[:1],collider="box",size=size,current_color=color.black,font="assets\\fonts\\8-bit Arcade In.ttf",parent=scene)
-        self.out = Text(text=text[:1],size=size,current_color=color.white,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self,resolution=self.default_resolution)
+        super().__init__(text=text[:1],size=size,current_color=color.black,font="assets\\fonts\\Retro Gaming.ttf",parent=scene)
         if isinstance(position,Entity):
             self.position = position.position + Vec3(position.scale_x,position.scale_y,0)
         else :
@@ -42,11 +41,7 @@ class Bubble(Text):
             setattr(self, key, value)
         self.full_text=text
         self.next = next
-        self.collider.width = self.get_width()
 
-    def on_click(self):
-        self.collider.scale_x = self.get_width()
-        #self.skip()
     
     def skip(self):
         if self.appear_sequence and not self.appear_sequence.finished:
@@ -70,14 +65,12 @@ class Bubble(Text):
         self.appear_sequence = Sequence()
         tn = self.text_nodes[0]
         tn.node().setText('')
-        self.out.text_nodes[0].node().setText('')
         new_text = ''
 
         for char in target_text:
             new_text += char
             self.appear_sequence.append(Wait(speed))
             self.appear_sequence.append(Func(tn.node().setText, new_text))
-            self.appear_sequence.append(Func(self.out.text_nodes[0].node().setText, new_text))
 
         self.appear_sequence.start()
         return self.appear_sequence

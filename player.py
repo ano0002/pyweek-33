@@ -13,7 +13,7 @@ class Turn(Animation):
 
 class Player(Entity):
     def __init__(self,level,speed = 6,gravity = 1,max_jumps =2,sprite_scale=1,controls = ["q","z","d"],**kwargs):
-        super().__init__(model="cube",collider="box",scale = (0.9,0.3), **kwargs)
+        super().__init__(model="cube",collider="box",scale = (0.9,0.62), **kwargs)
         self.visible_self = False
         
         self.map = level
