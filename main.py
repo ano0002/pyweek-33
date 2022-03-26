@@ -1,7 +1,7 @@
 from ursina import *
 from player import Player
 from level import Map
-from start_menu import StartMenu
+from menus import StartMenu,EndMenu
 from custom_stuff import Dialogue
 from ui import Bubble
 
@@ -18,22 +18,15 @@ window.color = color.black
 scene.fog_density = 0
 
 def next_level():
-    global level,dialogue_file
-    freeze()
-    for entity in scene.entities :
-        if not isinstance(entity,Player) :
-            destroy(entity)
+    if gamemap :
+        scene.clear()
+        start()
+    else :
+        freeze()
+        restart()
+        Dialogue("lore/lore3.dialogue",player1,player2,EndMenu).next()
     
-    level,dialogue_file = gamemap.pop(0)
-    level.add_player(player1)
-    level.add_player(player2)
-    level.generate()
-    level.setup_camera()
-    restart()
-    dialogue = Dialogue(dialogue_file,player1,player2,unfreeze)
-    dialogue.next()
-    
-gamemap = [(Map("levels/1.1.csv",end=next_level),"lore/start.dialogue"),(Map("levels/1.2.csv",end=next_level),"lore/2.dialogue")]
+gamemap = [(Map("levels/1.1.csv",end=next_level),"lore/lore0.dialogue"),(Map("levels/1.2.csv",end=next_level),"lore/lore1.dialogue"),(Map("levels/1.3.csv",end=next_level),"lore/lore2.dialogue")]
 
 level,dialogue_file = (None,None)
 
@@ -51,6 +44,7 @@ def start():
     restart()
     dialogue = Dialogue(dialogue_file,player1,player2,unfreeze)
     dialogue.next()
+
     
 def restart():
     spawn_pos = level.get_spawns()

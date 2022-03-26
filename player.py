@@ -25,7 +25,7 @@ class Player(Entity):
         self.jumps = 0
         self.max_jumps = max_jumps
         self.points=0
-        self.jump_height = 13
+        self.jump_height = 15.2
         
         self.controls = controls
         

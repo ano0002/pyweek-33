@@ -1,4 +1,3 @@
-import imp
 from ursina import *
 from ui import CustomButton
 
@@ -14,3 +13,9 @@ class StartMenu():
         destroy(self.button)
         self.on_start()
         camera.overlay.color = color.clear
+
+class EndMenu():
+    
+    def __init__(self) -> None:
+        scene.clear()
+        Text(text="Good job for finishing the game\n\nI hope you enjoyed it",size=.05,position=(-.4,.1),current_color=color.white,font="assets\\fonts\\Retro Gaming.ttf")
