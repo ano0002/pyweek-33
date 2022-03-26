@@ -48,7 +48,33 @@ class Vines3(Entity):
     def __init__(self,position,**kwargs):
         super().__init__(model="cube",position = position,texture="vines_3.png",**kwargs)
 
-  
+class DisappearingWall(Entity):
+    drag = 0
+    animated = False
+    solid = True
+    def __init__(self,position,mapdata,**kwargs):
+        self.solid = True
+        self.mapdata = mapdata.data
+        super().__init__(model="cube",position = position,color=color.gray,**kwargs)
+
+    def disappear(self):
+        self.mapdata[abs(self.Y)][abs(self.X)] = -1
+        self.animate_color(color.clear)
+        
+    def appear(self):
+        self.mapdata[abs(self.Y)][abs(self.X)] = 0
+        self.animate_color(color.gray)
+    
+    def toggle(self):
+        if self.color == color.clear :
+            self.appear()
+        else :
+            self.disappear()
+    
+    def on_click(self):
+        self.toggle()
+        
+
 class Door(Entity):
     solid = False
     drag = 0
@@ -72,7 +98,7 @@ class Plain(Entity):
     drag = 0
     animated = False
     def __init__(self,position,**kwargs):
-        super().__init__(model="cube",position = position,color=color.black,**kwargs)
+        super().__init__(model="plane",rotation_x=-90,position = position,color=color.black,**kwargs)
 
 class Spike(Entity):
     solid = False
@@ -96,9 +122,9 @@ class HorizontalSawBlade(Animation):
     def update(self):
         map_y = int(abs(self.position[1]))
         self.x += time.dt*self.velocity
-        if self.map.data[map_y][self.X] not in (5,6) and self.velocity == -1:
+        if self.map.data[map_y][self.X] not in (17,18) and self.velocity == -1:
             self.velocity *= -1
-        elif self.map.data[map_y][self.X+1] not in (5,6) and self.velocity == 1:
+        elif self.map.data[map_y][self.X+1] not in (17,18) and self.velocity == 1:
             self.velocity *= -1
             
 class VerticalSawBlade(Animation):
@@ -117,34 +143,35 @@ class VerticalSawBlade(Animation):
         self.y += time.dt*self.velocity
         
         if abs(self.last_y_change-self.y)>0.5 :
-            if self.map.data[map_y][self.X] not in (7,6) and self.velocity == -1:
+            if self.map.data[map_y][self.X] not in (4,17) and self.velocity == -1:
                 self.velocity *= -1
                 self.last_y_change = self.y
-            elif self.map.data[map_y-1][self.X] not in (7,6) and self.velocity == 1:
+            elif self.map.data[map_y-1][self.X] not in (4,17) and self.velocity == 1:
                 self.velocity *= -1
                 self.last_y_change = self.y
     
  
 BLOCK_IDS = {
     -1 : Air,
-    0:Carpet1,
-    1:Carpet2,
-    2:Carpet3,
-    3:Spike,
-    4:Vines1,
+    0:Plain,
+    1:Vines1,
+    2:Carpet1,
+    3:Air,#lever
+    4:VerticalSawBlade,
     5:Vines2,
     6:Vines3,
-    7 : Plain,
-    8 : Door,
+    7:Carpet2,
+    8:Spike,
+    9:DisappearingWall,
+    10:Carpet3,
+    11:Air,#button
+    13:Door,
+    15:Water,
+    16:DisappearingWall,
+    17:Air,#SawBlade Paths
+    18:HorizontalSawBlade,
 }
-"""
-    2 : Water,
-    3 : Plain,
-    4 : Spike,
-    5 : HorizontalSawBlade,
-    6 : Air,
-    7 : VerticalSawBlade,
-"""
+
 class Map():
     def __init__(self,file) -> None:
         self.data = []
@@ -163,16 +190,16 @@ class Map():
         for i,line in enumerate(self.data):
             i = -i
             for j,block in enumerate(line):
-                if block > 0 :
+                if block > -1 :
                     block = BLOCK_IDS[block](position=(j,i),above=self.data[abs(i)-1][j],mapdata=self)
                     if block.animated :
                         self.to_animate.append(block)
         for j,(up,down) in enumerate(zip(self.data[0],self.data[-1])):
-            if down > 0 :
+            if down > -1 :
                 block = BLOCK_IDS[down](position=(j,-self.height),above=down)
                 if block.animated :
                     self.to_animate.append(block)
-            if up > 0 :
+            if up > -1 :
                 block = BLOCK_IDS[up](position=(j,1),above=self.data[0][j])
                 if block.animated :
                     self.to_animate.append(block)

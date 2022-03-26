@@ -104,13 +104,15 @@ class Player(Entity):
             self.sprite.set_state("right")
             
         self.grounded = abs(self.velocity[1])<self.gravity/2
-        touching = self.intersects()
-        if touching.hit :
-            for entity in touching.entities:
-                if hasattr(entity,"deadly") and entity.deadly == True:
-                    self.die()
-                if hasattr(entity,"activate") and entity.activate != None:
-                    entity.activate(self)
+        
+        if self.frames%5 == 0 :
+            touching = self.intersects()
+            if touching.hit :
+                for entity in touching.entities:
+                    if hasattr(entity,"deadly") and entity.deadly == True:
+                        self.die()
+                    if hasattr(entity,"activate") and entity.activate != None:
+                        entity.activate(self)
         
     def input(self,key):
         if key == self.controls[1]:

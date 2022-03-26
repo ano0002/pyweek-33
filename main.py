@@ -5,7 +5,7 @@ from start_menu import StartMenu
 from custom_stuff import Dialogue
 from ui import Bubble
 
-app = Ursina(vsync = True)
+app = Ursina()
 
 musics = [Audio("OST - dist 0",autoplay=False)]
 
@@ -17,7 +17,7 @@ sfx = {
 window.color = color.black
 scene.fog_density = 0
 
-level = Map("levels/test.csv")
+level = Map("levels/map.csv")
 
 
 def start():
