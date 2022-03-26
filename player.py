@@ -12,7 +12,7 @@ class Turn(Animation):
         super().__init__("turn",texture_scale = (direction,1),scale=.2,color=color.black,origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
 
 class Player(Entity):
-    def __init__(self,level,speed = 6,gravity = 1,max_jumps =2,sprite_scale=1,controls = ["q","z","d"],**kwargs):
+    def __init__(self,level,speed = 6,gravity = 1,max_jumps =1,sprite_scale=1,controls = ["q","z","d"],evil=False,**kwargs):
         super().__init__(model="cube",collider="box",scale = (0.9,0.62),always_on_top=True, **kwargs)
         self.visible_self = False
         self.y -= self.scale_y/4
@@ -25,15 +25,20 @@ class Player(Entity):
         self.jumps = 0
         self.max_jumps = max_jumps
         self.points=0
-        self.jump_height = 12
+        self.jump_height = 13
         
         self.controls = controls
         
         world_sprite_scale = (sprite_scale[0]/self.scale_x,sprite_scale[1]/self.scale_y)
         sprite_y = self.y-self.scale_y/2
-        idle = Animation("idle",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
-        right = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
-        left = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,texture_scale = (-1,1),world_y=sprite_y)
+        if not evil :
+            idle = Animation("idle",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
+            right = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,world_y=sprite_y)
+            left = Animation("walk",parent = self,scale=world_sprite_scale,origin=(0,-.5),color = self.color,texture_scale = (-1,1),world_y=sprite_y)
+        else :
+            idle = Animation("idle_evil",parent = self,scale=world_sprite_scale,origin=(0,-.5),color=color.rgb(255,120,120),world_y=sprite_y)
+            right = Animation("walk_evil",parent = self,scale=world_sprite_scale,origin=(0,-.5),color=color.rgb(255,120,120),world_y=sprite_y)
+            left = Animation("walk_evil",parent = self,scale=world_sprite_scale,origin=(0,-.5),color=color.rgb(255,120,120),texture_scale = (-1,1),world_y=sprite_y)
         self.sprite = CustomAnimator(
             animations = {
                 'idle' : idle,
@@ -111,7 +116,7 @@ class Player(Entity):
             touching = self.intersects()
             if touching.hit :
                 for entity in touching.entities:
-                    if hasattr(entity,"deadly") and entity.deadly == True:
+                    if (hasattr(entity,"deadly") and entity.deadly == True) or isinstance(entity,Player):
                         self.die()
                     if hasattr(entity,"activate") and entity.activate != None:
                         entity.activate(self)
@@ -148,6 +153,10 @@ class Player(Entity):
                              duration = 0.2,
                              velocity=(x, y),
                              color = color.black)
+
+    def revive(self):
+        self.velocity = [0,0]
+        self.enable()
 
     def freeze(self) :
         self.freezed = True

@@ -17,7 +17,7 @@ sfx = {
 window.color = color.black
 scene.fog_density = 0
 
-level = Map("levels/map.csv")
+level = Map("levels/1.2.csv")
 
 
 def start():
@@ -27,8 +27,19 @@ def start():
     level.setup_camera()
     spawn_pos = level.get_spawns()
     player1 = Player(level,position = spawn_pos[0],sprite_scale = (1,1))
-    player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1),controls=['left arrow','up arrow','right arrow'])
-    Dialogue("lore/start.dialogue",player1,player2,unfreeze)
+    player2 = Player(level,position = spawn_pos[1],sprite_scale = (1,1),evil=True)
+    #Dialogue("lore/start.dialogue",player1,player2,unfreeze)
+    unfreeze()
+    
+def restart():
+    spawn_pos = level.get_spawns()
+    for block in level.disappearings_block:
+        if not block.solid :
+            block.appear()
+    player1.set_position((*spawn_pos[0],0))
+    player1.revive()
+    player2.set_position((*spawn_pos[1],0))
+    player2.revive()
 
 def unfreeze():
     player1.unfreeze()
@@ -63,12 +74,10 @@ def input(key):
         for entity in  entities:
             if isinstance(entity,Bubble):
                 entity.skip()
-    if key == "a" :
-        bubble = Bubble("random text placeholder",position=player1)
-        bubble.appear()
+    if key == "r" :
+        restart()
         
 
 
-_ed = EditorCamera( )
 
 app.run()
