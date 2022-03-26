@@ -10,6 +10,45 @@ class Water(Entity):
     def next_frame(self,elapsed_time,**kwargs):
         self.texture_offset = (0,elapsed_time/5)
   
+class Carpet1(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="carpet_1.png",**kwargs)
+class Carpet2(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="carpet_2.png",**kwargs)        
+class Carpet3(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="carpet_3.png",**kwargs)
+
+class Vines1(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="vines_1.png",**kwargs)
+class Vines2(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="vines_2.png",**kwargs)
+class Vines3(Entity):
+    solid = False
+    drag = 0
+    animated = False
+    def __init__(self,position,**kwargs):
+        super().__init__(model="cube",position = position,texture="vines_3.png",**kwargs)
+
+  
 class Door(Entity):
     solid = False
     drag = 0
@@ -88,13 +127,13 @@ class VerticalSawBlade(Animation):
  
 BLOCK_IDS = {
     -1 : Air,
-    0:Air,
-    1:Air,
-    2:Air,
+    0:Carpet1,
+    1:Carpet2,
+    2:Carpet3,
     3:Spike,
-    4:Air,
-    5:Air,
-    6:Air,
+    4:Vines1,
+    5:Vines2,
+    6:Vines3,
     7 : Plain,
     8 : Door,
 }
