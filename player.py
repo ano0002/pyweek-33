@@ -141,6 +141,3 @@ class Player(Entity):
                              duration = 0.2,
                              velocity=(x, y),
                              color = color.black)
-        self.disable()
-
-        print("Ouch")

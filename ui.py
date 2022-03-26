@@ -30,10 +30,10 @@ class CustomButton(Entity):
             return
         
 class Bubble(Text):
-    
     def __init__(self,text,position,next=None,size=.5, **kwargs):
-        super().__init__(text=text[:1],collider="box",size=size,current_color=color.white,font="assets\\fonts\\8-bit Arcade In.ttf",parent=scene)
-        self.out = Text(text=text[:1],size=size,current_color=color.black,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self)
+        self.default_resolution = 1080
+        super().__init__(text=text[:1],collider="box",size=size,current_color=color.black,font="assets\\fonts\\8-bit Arcade In.ttf",parent=scene)
+        self.out = Text(text=text[:1],size=size,current_color=color.white,font="assets\\fonts\\8-bit Arcade Out.ttf",parent=self,resolution=self.default_resolution)
         if isinstance(position,Entity):
             self.position = position.position + Vec3(position.scale_x,position.scale_y,0)
         else :
