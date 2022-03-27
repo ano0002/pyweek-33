@@ -19,7 +19,7 @@ Reach the goal(staircase) with both of the two entities you control or only one 
 If they hit each other they die !
 Don't fall in the water !
 
-This game was made by ano002 for the [pyweek 33](https://pyweek.org/33/entries/) 
+This game was made by ano002 and NufNuf for the [pyweek 33](https://pyweek.org/33/entries/) 
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
