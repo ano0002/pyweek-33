@@ -24,8 +24,8 @@ class Dialogue():
         self.users = {
             "main" : main,
             "evil" : evil,
-            "mom" : (0,-2,0),
-            "action" : (0,-2,0)
+            "mom" : (0,1,-1),
+            "action" : (0,1,-1)
             }
         self.lines = []
         with open(file,"r") as f:

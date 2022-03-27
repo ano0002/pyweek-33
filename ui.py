@@ -27,11 +27,11 @@ class CustomButton(Entity):
             return
         
 class Bubble(Text):
-    def __init__(self,text,position,next=None,size=.5, **kwargs):
+    def __init__(self,text,position,next=None,size=1, **kwargs):
         self.default_resolution = 1080
-        super().__init__(text=text[:1],size=size,current_color=color.black,font="assets\\fonts\\Retro Gaming.ttf",parent=scene)
+        super().__init__(text=text[:1],size=size,current_color=color.white,font="assets\\fonts\\Retro Gaming.ttf",parent=scene)
         if isinstance(position,Entity):
-            self.position = position.position + Vec3(position.scale_x,position.scale_y,0)
+            self.position = position.position + Vec3(position.scale_x,position.scale_y,-1)
         else :
             self.position = position
         for key, value in kwargs.items():
@@ -68,6 +68,8 @@ class Bubble(Text):
             new_text += char
             self.appear_sequence.append(Wait(speed))
             self.appear_sequence.append(Func(tn.node().setText, new_text))
+            
+        self.appear_sequence.append(self.create_background())
 
         self.appear_sequence.start()
         return self.appear_sequence

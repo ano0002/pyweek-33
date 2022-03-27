@@ -10,7 +10,6 @@ app = Ursina()
 musics = [Audio("OST - dist 0",autoplay=False)]
 
 sfx = {
-    "clack" : Audio("SFX 1",autoplay=False),
     "door" : Audio("Door",autoplay=False)
 }
 

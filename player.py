@@ -12,7 +12,7 @@ class Turn(Animation):
         super().__init__("turn",texture_scale = (direction,1),scale=.2,color=color.black,origin = (0,-.5),position = pos,loop=False,autoplay=True,**kwargs)
 
 class Player(Entity):
-    def __init__(self,level,speed = 6,gravity = 1,max_jumps =1,sprite_scale=(1,1),controls = ["q","z","d"],evil=False,**kwargs):
+    def __init__(self,level,speed = 6,gravity = 1,max_jumps =1,sprite_scale=(1,1),controls = ["a","w","d"],evil=False,**kwargs):
         super().__init__(model="cube",collider="box",scale = (0.9,0.62),always_on_top=True, **kwargs)
         self.visible_self = False
         self.y -= self.scale_y/4
